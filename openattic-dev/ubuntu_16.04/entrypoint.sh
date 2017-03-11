@@ -61,8 +61,17 @@ function setup_oa {
   a2enconf openattic
   systemctl restart apache2
   cd /srv/openattic/webui
-  npm install
-  bower install --allow-root
+  touch a
+  chown openattic a &> /dev/null
+  CHOWN_RET=$?
+  if [ "$CHOWN_RET" == "0" ]; then
+    npm install
+    bower install --allow-root
+  else
+    runuser -l openattic -c 'cd /srv/openattic/webui && npm install && \
+                             bower install --allow-root'
+  fi
+  rm a
   grunt dev
 }
 
